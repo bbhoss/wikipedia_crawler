@@ -1,5 +1,4 @@
 defmodule WikipediaCrawler do
-  require IEx
 
   def crawl(url) do
     # Don't run awry of the rules
