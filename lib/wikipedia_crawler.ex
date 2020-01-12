@@ -13,7 +13,7 @@ defmodule WikipediaCrawler do
           is_relative_wiki_link(anchor),
           do: Floki.attribute(anchor, "href")
 
-    {response.body, links}
+    {response.body, Enum.uniq(links)}
   end
 
   defp is_relative_wiki_link([]), do: false

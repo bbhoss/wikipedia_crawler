@@ -2,6 +2,7 @@ defmodule WikipediaCrawler.Worker do
   use GenServer
   use AMQP
   require Logger
+  # TODO: Configuration
   @crawl_queue "crawl_queue"
   @redis_bloom_filter_key "crawled"
   @riak_bucket "wikipedia_content"
