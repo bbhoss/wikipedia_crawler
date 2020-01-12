@@ -16,14 +16,16 @@ defmodule WikipediaCrawler.Worker do
     {:ok, %{channel: channel, redis: redis}}
   end
 
-  def handle_info(msg = {:basic_deliver, url, %{delivery_tag: tag}}, state) do
+  def handle_info({:basic_deliver, url, %{delivery_tag: tag}}, state) do
     case Redix.command(state.redis, ["BF.EXISTS", "crawled", url]) do
       {:ok, 1} ->
         Logger.info("Already crawled #{url}, skipping")
         Basic.ack(state.channel, tag)
       {:ok, 0} ->
-        {content, urls} = WikipediaCrawler.crawl(url)
+        {_content, relative_paths} = WikipediaCrawler.crawl(url)
         Logger.debug("Fetched #{url}")
+        # Store content here
+        for path <- relative_paths, do: Basic.publish(state.channel, "", @crawl_queue, "https://en.wikipedia.org#{path}")
         Redix.command(state.redis, ["BF.ADD", "crawled", url])
         Basic.ack(state.channel, tag)
     end
