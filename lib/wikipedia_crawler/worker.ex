@@ -27,7 +27,7 @@ defmodule WikipediaCrawler.Worker do
       {content, relative_paths} = WikipediaCrawler.crawl(url)
       Logger.debug("Fetched #{url}")
       store_content(state.riak, url, content)
-      publish_links(state.channel, relative_paths)
+      publish_links(state.channel, state.redis, relative_paths)
       mark_crawled(state.redis, url)
 
       Basic.ack(state.channel, tag)
@@ -38,8 +38,10 @@ defmodule WikipediaCrawler.Worker do
 
   def handle_info({:basic_consume_ok, _}, state), do: {:noreply, state}
 
-  defp publish_links(channel, relative_paths) do
-    for path <- relative_paths, do: Basic.publish(channel, "", @crawl_queue, "https://en.wikipedia.org#{path}")
+  defp publish_links(channel, redis, relative_paths) do
+    for path <- relative_paths,
+      url = "https://en.wikipedia.org#{path}",
+      !crawled_url?(redis, url), do: Basic.publish(channel, "", @crawl_queue, url)
   end
 
   defp store_content(riak, url, content) do
