@@ -10,18 +10,18 @@ defmodule WikipediaCrawler do
 
     links =
       for anchor <- Floki.find(document, "a"),
-          is_relative_link(anchor),
+          is_relative_wiki_link(anchor),
           do: Floki.attribute(anchor, "href")
 
     {response.body, links}
   end
 
-  defp is_relative_link([]), do: false
+  defp is_relative_wiki_link([]), do: false
 
-  defp is_relative_link(anchor) do
+  defp is_relative_wiki_link(anchor) do
     case Floki.attribute(anchor, "href") do
       [] -> false
-      ["/" <> _bin | _t] -> true
+      ["/wiki/" <> _bin | _t] -> true
       _ -> false
     end
   end

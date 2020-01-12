@@ -27,6 +27,7 @@ defmodule WikipediaCrawler.MixProject do
       {:redix, "~> 0.10.4"},
       {:httpoison, "~> 1.6"},
       {:floki, "~> 0.24.0"},
+      {:riak, "~> 1.1.6"}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]
